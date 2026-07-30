@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HSBC Bank - Accounts Overview</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; margin: 0; background-color: #f4f5f7; color: #333; font-size: 13px; }
+        
+        /* Top Navigation Bar */
+        .top-bar { background: #fff; height: 60px; padding: 0 25px; border-bottom: 1px solid #d9d9d9; display: flex; justify-content: space-between; align-items: center; }
+        .logo-container { display: flex; align-items: center; gap: 10px; }
+        .logo-img { height: 26px; width: auto; }
+        .brand-name { font-size: 18px; font-weight: 700; color: #db0011; letter-spacing: -0.3px; }
+        .top-nav-right { display: flex; align-items: center; gap: 25px; color: #4a4a4a; font-size: 12px; }
+        .nav-item { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+        .user-profile { display: flex; align-items: center; gap: 8px; }
+        .avatar { width: 28px; height: 28px; background: #db0011; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; }
+
+        /* Layout Container */
+        .main-layout { display: flex; min-height: calc(100vh - 60px); }
+
+        /* Left Sidebar */
+        .sidebar { width: 200px; background: #fff; border-right: 1px solid #e5e5e5; padding-top: 15px; flex-shrink: 0; }
+        .sidebar a { display: flex; align-items: center; gap: 12px; padding: 10px 20px; color: #4a4a4a; text-decoration: none; font-size: 13px; font-weight: 500; }
+        .sidebar a:hover { background-color: #f8f8f8; }
+        .sidebar a.active { background-color: #fcf2f2; color: #db0011; font-weight: 700; border-left: 4px solid #db0011; padding-left: 16px; }
+
+        /* Main Content */
+        .content { flex: 1; padding: 25px 35px; background: #fafafa; }
+        .page-title { font-size: 20px; font-weight: 700; color: #db0011; margin: 0 0 20px 0; }
+
+        /* Top Main Account Card */
+        .overview-card { background: #fff; border: 1px solid #e0e0e0; border-radius: 4px; padding: 25px; margin-bottom: 25px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+        .account-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .company-title { font-size: 16px; font-weight: 700; color: #111; }
+        .badge-active { background: #e6f4ea; color: #137333; font-weight: 600; padding: 4px 10px; border-radius: 12px; font-size: 11px; }
+
+        .account-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; border-bottom: 1px solid #f0f0f0; padding-bottom: 20px; }
+        .info-group label { display: block; font-size: 10px; color: #777; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .info-group span { font-size: 12px; font-weight: 700; color: #222; }
+
+        .balance-banner { background: #fdf2f2; border-left: 4px solid #db0011; padding: 15px 20px; border-radius: 2px; display: flex; justify-content: space-between; align-items: center; }
+        .balance-banner-left label { display: block; font-size: 11px; font-weight: 700; color: #db0011; text-transform: uppercase; margin-bottom: 2px; }
+        .balance-banner-left span { font-size: 10px; color: #666; }
+        .balance-banner-right { text-align: right; }
+        .balance-banner-amount { font-size: 20px; font-weight: 800; color: #111; }
+        .balance-banner-words { font-size: 10px; color: #666; margin-top: 2px; }
+
+        /* Linked Accounts Table Card */
+        .section-card { background: #fff; border: 1px solid #e0e0e0; border-radius: 4px; padding: 20px; margin-bottom: 25px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+        .section-title { font-size: 14px; font-weight: 700; color: #db0011; margin: 0 0 15px 0; }
+
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #db0011; color: white; text-align: left; padding: 10px 12px; font-size: 11px; font-weight: 700; border: 1px solid #db0011; }
+        td { padding: 12px; border: 1px solid #e8e8e8; font-size: 11px; color: #333; }
+        tr:nth-child(even) td { background-color: #fafafa; }
+        .text-right { text-align: right; }
+
+        /* HSBC Debit Card Display Section */
+        .cards-flex-container { display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap; }
+        
+        /* Debit Card Design */
+        .debit-card-visual { 
+            width: 320px; 
+            height: 190px; 
+            background: linear-gradient(135deg, #2c2c2c 0%, #111111 60%, #db0011 100%); 
+            border-radius: 12px; 
+            padding: 20px; 
+            color: white; 
+            box-shadow: 0 6px 15px rgba(0,0,0,0.25); 
+            position: relative; 
+            overflow: hidden; 
+            flex-shrink: 0; 
+        }
+        .debit-card-visual::after { content: ''; position: absolute; right: -20px; top: -20px; width: 100px; height: 100px; background: rgba(219, 0, 17, 0.3); border-radius: 50%; }
+        .card-brand { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .card-logo { font-size: 14px; font-weight: 800; letter-spacing: 0.5px; color: #fff; }
+        .card-type { font-size: 9px; background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 3px; letter-spacing: 1px; }
+        .card-chip { width: 35px; height: 26px; background: #e0b034; border-radius: 4px; margin-bottom: 15px; position: relative; }
+        .card-number { font-size: 15px; font-family: monospace; letter-spacing: 2px; margin-bottom: 15px; }
+        .card-details { display: flex; justify-content: space-between; font-size: 10px; color: #ddd; }
+        .card-holder { text-transform: uppercase; font-weight: 600; }
+
+        /* Debit Card Meta Details */
+        .card-info-box { flex: 1; min-width: 250px; background: #fafafa; border: 1px solid #e8e8e8; border-radius: 6px; padding: 15px; }
+        .card-meta-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; font-size: 11px; }
+        .card-meta-row:last-child { border-bottom: none; }
+        .card-meta-label { color: #666; }
+        .card-meta-val { font-weight: 700; color: #222; }
+
+        .btn-card-action { background: #fff; border: 1px solid #db0011; color: #db0011; padding: 5px 12px; border-radius: 3px; font-size: 11px; font-weight: 600; cursor: pointer; margin-top: 10px; transition: 0.2s; }
+        .btn-card-action:hover { background: #db0011; color: white; }
+    </style>
+</head>
+<body>
+
+    <!-- Top Navigation Bar -->
+    <div class="top-bar">
+        <div class="logo-container">
+            <img src="logo.jpeg" alt="HSBC Logo" class="logo-img">
+            <span class="brand-name">HSBC Bank</span>
+        </div>
+        <div class="top-nav-right">
+            <div class="nav-item">✉ Messages</div>
+            <div class="nav-item">🔔 Notifications</div>
+            <div class="user-profile">
+                <div class="avatar">👤</div>
+                <div>
+                    <span style="font-size: 10px; color: #777; display: block;">Welcome,</span>
+                    <strong>Junaid Ikram</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Layout -->
+    <div class="main-layout">
+        
+        <!-- Left Sidebar Navigation -->
+        <div class="sidebar">
+            <a href="dashboard.html" onclick="navigateTo(event, 'dashboard.html')">田 Dashboard</a>
+            <a href="accounts.html" class="active" onclick="navigateTo(event, 'accounts.html')">📑 Accounts</a>
+            <a href="transfer.html" onclick="navigateTo(event, 'transfer.html')">⇄ Transfers</a>
+            <a href="payments.html" onclick="navigateTo(event, 'payments.html')">💳 Payments</a>
+            <a href="beneficiaries.html" onclick="navigateTo(event, 'beneficiaries.html')">👥 Beneficiaries</a>
+            <a href="#">📊 Trade Services</a>
+            <a href="#">📈 Reports</a>
+            <a href="statements.html" onclick="navigateTo(event, 'statements.html')">📄 Statements</a>
+            <a href="#">🔔 Alerts</a>
+            <a href="settings.html" onclick="navigateTo(event, 'settings.html')">⚙ Settings</a>
+            <a href="#">❓ Help & Support</a>
+            <a href="#" onclick="handleLogout(event)">↪ Logout</a>
+        </div>
+
+        <!-- Right Main Content Area -->
+        <div class="content">
+            <div class="page-title">Accounts Overview</div>
+
+            <!-- Main Corporate Account Detail Card -->
+            <div class="overview-card">
+                <div class="account-header">
+                    <div class="company-title">Junaid Ikram painting contracting L.L.C</div>
+                    <span class="badge-active">Active Account</span>
+                </div>
+
+                <div class="account-info-grid">
+                    <div class="info-group">
+                        <label>Account Type</label>
+                        <span>Business Corporate Account</span>
+                    </div>
+                    <div class="info-group">
+                        <label>Account Number</label>
+                        <span>AEBBME024202368001</span>
+                    </div>
+                    <div class="info-group">
+                        <label>IBAN</label>
+                        <span>AE94020000024202368001</span>
+                    </div>
+                    <div class="info-group">
+                        <label>Branch & Location</label>
+                        <span>HSBC Dubai Downtown, UAE</span>
+                    </div>
+                </div>
+
+                <div class="balance-banner">
+                    <div class="balance-banner-left">
+                        <label>Available Ledger Balance</label>
+                        <span>Currency: USD (United States Dollar)</span>
+                    </div>
+                    <div class="balance-banner-right">
+                        <div class="balance-banner-amount">USD 1,240,000,000.00</div>
+                        <div class="balance-banner-words">( One Billion Two Hundred Forty Million US Dollars Only )</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Linked Bank Accounts Section -->
+            <div class="section-card">
+                <h3 class="section-title">Linked Bank Accounts</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Account Name</th>
+                            <th>Account Type</th>
+                            <th>Account / IBAN Number</th>
+                            <th>Currency</th>
+                            <th class="text-right">Available Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Junaid Ikram painting contracting L.L.C</td>
+                            <td>Business Account</td>
+                            <td>AE94020000024202368001</td>
+                            <td>USD</td>
+                            <td class="text-right" style="font-weight: 700;">1,240,000,000.00</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Linked HSBC Corporate Debit Card Section -->
+            <div class="section-card">
+                <h3 class="section-title">Linked HSBC Debit Cards</h3>
+                <div class="cards-flex-container">
+                    
+                    <!-- HSBC Debit Card Graphic -->
+                    <div class="debit-card-visual">
+                        <div class="card-brand">
+                            <span class="card-logo">HSBC</span>
+                            <span class="card-type">BUSINESS DEBIT</span>
+                        </div>
+                        <div class="card-chip"></div>
+                        <div class="card-number">•••• •••• •••• 9012</div>
+                        <div class="card-details">
+                            <div>
+                                <span style="font-size: 8px; display: block; color: #aaa;">CARD HOLDER</span>
+                                <span class="card-holder">JUNAID IKRAM PAINTING CONTRACTING LLC</span>
+                            </div>
+                            <div style="text-align: right;">
+                                <span style="font-size: 8px; display: block; color: #aaa;">EXPIRES</span>
+                                <span>05/31</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Debit Card Details & Status Box -->
+                    <div class="card-info-box">
+                        <div class="card-meta-row">
+                            <span class="card-meta-label">Card Status</span>
+                            <span class="card-meta-val" style="color: #137333;">Active / Enabled</span>
+                        </div>
+                        <div class="card-meta-row">
+                            <span class="card-meta-label">Card Type</span>
+                            <span class="card-meta-val">VISA Corporate Commercial</span>
+                        </div>
+                        <div class="card-meta-row">
+                            <span class="card-meta-label">Linked Account</span>
+                            <span class="card-meta-val">AEBBME024202368001</span>
+                        </div>
+                        <div class="card-meta-row">
+                            <span class="card-meta-label">Daily ATM Limit</span>
+                            <span class="card-meta-val">USD 10,000.00</span>
+                        </div>
+                        <div class="card-meta-row">
+                            <span class="card-meta-label">Daily POS Limit</span>
+                            <span class="card-meta-val">USD 50,000.00</span>
+                        </div>
+                        <button class="btn-card-action" onclick="navigateTo(event, 'settings.html')">⚙ Manage Card Controls</button>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Page Loader Spinner -->
+    <div class="loading-overlay" id="loadingSpinner" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(255, 255, 255, 0.75); justify-content: center; align-items: center; flex-direction: column; z-index: 2000;">
+        <div class="spinner" style="width: 45px; height: 45px; border: 4px solid #f3f3f3; border-top: 4px solid #db0011; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+        <p style="margin-top: 15px; font-weight: bold; color: #333; font-size: 13px;">Loading Accounts...</p>
+    </div>
+
+    <style>
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+
+    <!-- Page Routing Script -->
+    <script>
+        function navigateTo(event, pageUrl) {
+            event.preventDefault();
+            var loader = document.getElementById('loadingSpinner');
+            if(loader) {
+                loader.style.display = 'flex';
+            }
+            setTimeout(function() {
+                window.location.href = pageUrl;
+            }, 1200);
+        }
+
+        function handleLogout(event) {
+            event.preventDefault();
+            if(confirm("Are you sure you want to log out?")) {
+                window.location.href = "login.html";
+            }
+        }
+    </script>
+</body>
+</html>

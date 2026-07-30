@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HSBC Bank - Money Transfer</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+        body { background-color: #f4f5f7; color: #333; font-size: 13px; }
+
+        /* Top Header */
+        .top-bar { background: #fff; height: 60px; padding: 0 25px; border-bottom: 1px solid #d9d9d9; display: flex; justify-content: space-between; align-items: center; }
+        .logo-container { display: flex; align-items: center; gap: 10px; }
+        .logo-img { height: 26px; width: auto; }
+        .brand-name { font-size: 18px; font-weight: 700; color: #db0011; }
+        .top-nav-right { display: flex; align-items: center; gap: 25px; color: #4a4a4a; font-size: 12px; }
+        .user-profile { display: flex; align-items: center; gap: 8px; }
+        .avatar { width: 28px; height: 28px; background: #db0011; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; }
+
+        /* Main Layout */
+        .main-layout { display: flex; min-height: calc(100vh - 60px); }
+
+        /* Sidebar */
+        .sidebar { width: 200px; background: #fff; border-right: 1px solid #e5e5e5; padding-top: 15px; flex-shrink: 0; }
+        .sidebar a { display: flex; align-items: center; gap: 12px; padding: 10px 20px; color: #4a4a4a; text-decoration: none; font-size: 13px; font-weight: 500; }
+        .sidebar a:hover { background-color: #f8f8f8; }
+        .sidebar a.active { background-color: #fcf2f2; color: #db0011; font-weight: 700; border-left: 4px solid #db0011; padding-left: 16px; }
+
+        /* Content Area */
+        .content { flex: 1; padding: 25px 35px; background: #fafafa; }
+        .page-title { font-size: 18px; font-weight: 700; color: #db0011; margin-bottom: 20px; }
+
+        /* Transfer Type Cards */
+        .cards-container { display: flex; gap: 20px; margin-bottom: 25px; }
+        .transfer-card { flex: 1; background: #fff; border: 1px solid #e0e0e0; border-radius: 6px; padding: 18px; display: flex; align-items: center; gap: 15px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+        .transfer-card:hover { border-color: #db0011; }
+        .transfer-card.active { border: 1.5px solid #db0011; background-color: #fdf5f5; }
+        .card-icon { width: 42px; height: 42px; background: #db0011; border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+        .card-title { font-weight: 700; font-size: 13px; color: #111; margin-bottom: 3px; }
+        .card-desc { font-size: 11px; color: #666; }
+
+        /* Transfer Form Container */
+        .form-container { background: #fff; border: 1px solid #e0e0e0; border-radius: 6px; padding: 25px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); max-width: 800px; }
+        .form-section-title { font-size: 14px; font-weight: 700; color: #222; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 1px solid #eee; }
+
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group.full-width { grid-column: span 2; }
+
+        label { font-size: 12px; font-weight: 600; color: #444; }
+        select, input[type="text"], input[type="number"] { width: 100%; padding: 10px 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px; outline: none; transition: border 0.2s; }
+        select:focus, input:focus { border-color: #db0011; }
+
+        /* Balance Info Badge */
+        .balance-info { font-size: 11px; color: #666; margin-top: 4px; display: flex; justify-content: space-between; }
+
+        /* Submit Button */
+        .btn-submit { background: #db0011; color: #fff; border: none; padding: 12px 25px; border-radius: 4px; font-weight: 700; font-size: 13px; cursor: pointer; transition: background 0.2s; }
+        .btn-submit:hover { background: #b8000e; }
+
+        /* Modal Overlay & Popup Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .popup-card {
+            background: #ffffff;
+            width: 420px;
+            padding: 30px 25px;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            text-align: center;
+            position: relative;
+        }
+
+        .warning-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 15px auto;
+            display: block;
+        }
+
+        .popup-title { font-size: 16px; font-weight: 700; color: #111; margin-bottom: 15px; }
+        .popup-message { font-size: 12px; color: #222; line-height: 1.5; margin-bottom: 15px; }
+        .popup-subtext { font-size: 12px; color: #222; margin-bottom: 25px; }
+
+        .popup-buttons { display: flex; gap: 12px; justify-content: center; margin-bottom: 15px; }
+        .btn-support { background: #db0011; color: #fff; border: none; padding: 10px 20px; border-radius: 4px; font-weight: 700; font-size: 12px; cursor: pointer; flex: 1; }
+        .btn-close { background: #f0f0f0; color: #333; border: 1px solid #ccc; padding: 10px 20px; border-radius: 4px; font-weight: 700; font-size: 12px; cursor: pointer; flex: 1; }
+        .popup-id { font-size: 10px; color: #777; }
+
+        /* Loading Screen Overlay */
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.7);
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 2000;
+        }
+
+        .spinner {
+            width: 45px;
+            height: 45px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #db0011;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Loading Screen Overlay -->
+    <div class="loading-overlay" id="loadingSpinner">
+        <div class="spinner"></div>
+        <p style="margin-top: 15px; font-weight: bold; color: #333;">Processing Transfer Request...</p>
+    </div>
+
+    <!-- Header -->
+    <div class="top-bar">
+        <div class="logo-container">
+            <img src="logo.jpeg" alt="HSBC Logo" class="logo-img">
+            <span class="brand-name">HSBC Bank</span>
+        </div>
+        <div class="top-nav-right">
+            <div>✉ Messages</div>
+            <div>🔔 Notifications</div>
+            <div class="user-profile">
+                <div class="avatar">👤</div>
+                <div><span style="font-size: 10px; color: #777;">Welcome,</span><br><strong>Junaid Ikram</strong></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Layout -->
+    <div class="main-layout">
+        
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <a href="dashboard.html">田 Dashboard</a>
+            <a href="accounts.html">📑 Accounts</a>
+            <a href="transfer.html" class="active">⇄ Transfers</a>
+            <a href="payments.html">💳 Payments</a>
+            <a href="beneficiaries.html">👥 Beneficiaries</a>
+            <a href="#">📊 Trade Services</a>
+            <a href="#">📈 Reports</a>
+            <a href="statements.html">📄 Statements</a>
+            <a href="#">🔔 Alerts</a>
+            <a href="settings.html">⚙ Settings</a>
+            <a href="#">❓ Help & Support</a>
+            <a href="#" onclick="handleLogout(event)">↪ Logout</a>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <h2 class="page-title">Transfer Funds</h2>
+
+            <!-- Transfer Type Cards -->
+            <div class="cards-container">
+                <div class="transfer-card active" onclick="selectTransferType(this)">
+                    <div class="card-icon">⇄</div>
+                    <div>
+                        <div class="card-title">Between My Accounts</div>
+                        <div class="card-desc">Transfer within your HSBC accounts</div>
+                    </div>
+                </div>
+                <div class="transfer-card" onclick="selectTransferType(this)">
+                    <div class="card-icon">🇦🇪</div>
+                    <div>
+                        <div class="card-title">Local Bank Transfer</div>
+                        <div class="card-desc">Transfer to other banks within UAE</div>
+                    </div>
+                </div>
+                <div class="transfer-card" onclick="selectTransferType(this)">
+                    <div class="card-icon">🌐</div>
+                    <div>
+                        <div class="card-title">International Transfer</div>
+                        <div class="card-desc">Send money worldwide quickly</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transfer Form -->
+            <div class="form-container">
+                <div class="form-section-title">Transfer Details</div>
+                
+                <form onsubmit="handleTransferSubmit(event)">
+                    <div class="form-grid">
+                        
+                        <!-- From Account -->
+                        <div class="form-group">
+                            <label for="fromAccount">From Account</label>
+                            <select id="fromAccount" required>
+                                <option value="">Select Source Account</option>
+                                <option value="current" selected>Current Account (AE94 02 xx xxx xxx 8001)</option>
+                                <option value="savings">Millionaire Corporate Account (AE31 02 xx xxx xxx 6103)</option>
+                            </select>
+                            <div class="balance-info">
+                                <span>Available Balance:</span>
+                                <strong>USD 1,240,000,000</strong>
+                            </div>
+                        </div>
+
+                        <!-- To Beneficiary / Account -->
+                        <div class="form-group">
+                            <label for="toBeneficiary">To Beneficiary</label>
+                            <select id="toBeneficiary" required>
+                                <option value="">Select Beneficiary</option>
+                                <option value="1">Junaid Ikram (Emirates NBD - 6101)</option>
+                                <option value="2">Aisha Khan (Emirates NBD - 8001)</option>
+                                <option value="3">G. Smith (Citybank London - 6801)</option>
+                            </select>
+                        </div>
+
+                        <!-- Amount -->
+                        <div class="form-group">
+                            <label for="amount">Amount (USD)</label>
+                            <input type="number" id="amount" placeholder="0.00" min="1" step="any" required>
+                        </div>
+
+                        <!-- Transfer Date -->
+                        <div class="form-group">
+                            <label for="transferDate">Transfer Date</label>
+                            <input type="text" id="transferDate" value="Immediate (Today)" readonly style="background-color: #f9f9f9;">
+                        </div>
+
+                        <!-- Payment Purpose -->
+                        <div class="form-group full-width">
+                            <label for="purpose">Purpose of Transfer</label>
+                            <select id="purpose" required>
+                                <option value="">Select Purpose</option>
+                                <option value="family">Family Support / Personal</option>
+                                <option value="savings">Investment / Savings</option>
+                                <option value="services">Payment for Services</option>
+                                <option value="trade">Commercial / Trade</option>
+                            </select>
+                        </div>
+
+                        <!-- Remarks -->
+                        <div class="form-group full-width">
+                            <label for="remarks">Remarks / Reference (Optional)</label>
+                            <input type="text" id="remarks" placeholder="Enter reference note for recipient">
+                        </div>
+
+                    </div>
+
+                    <button type="submit" class="btn-submit">Proceed with Transfer</button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Modal Popup Box -->
+    <div class="modal-overlay" id="popupModal">
+        <div class="popup-card">
+            <svg class="warning-icon" viewBox="0 0 24 24" fill="none" stroke="#db0011" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                <line x1="12" y1="9" x2="12" y2="13"></line>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+
+            <div class="popup-title">Critical Notification from HSBC Bank</div>
+
+            <div class="popup-message">
+                Dear Junaid Ikram, your account has been temporarily restricted. You must first clear the pending mandatory deposit as per bank policy before full transaction capabilities, including transfers, can be restored. Services will be limited until this deposit is verified.
+            </div>
+
+            <div class="popup-subtext">
+                For details or assistance, please contact customer support.
+            </div>
+
+            <div class="popup-buttons">
+                <button class="btn-support">Contact Support</button>
+                <button class="btn-close" onclick="closePopup()">Close</button>
+            </div>
+
+            <div class="popup-id">ID: REF-MSG-DEP</div>
+        </div>
+    </div>
+
+    <!-- JavaScript Functions -->
+    <script>
+        // ٹرانسفر فارم سبمٹ ہونے پر لوڈر اور Restriction پاپ اپ دکھانا
+        function handleTransferSubmit(event) {
+            event.preventDefault();
+            var loader = document.getElementById('loadingSpinner');
+            loader.style.display = 'flex';
+            
+            setTimeout(function() {
+                loader.style.display = 'none';
+                document.getElementById('popupModal').style.display = 'flex';
+            }, 1500); // 1.5 سیکنڈ لوڈنگ
+        }
+
+        // پاپ اپ بند کرنا
+        function closePopup() {
+            document.getElementById('popupModal').style.display = 'none';
+        }
+
+        // کارڈز کا ایکٹیو سٹیٹ تبدیل کرنا
+        function selectTransferType(element) {
+            var cards = document.querySelectorAll('.transfer-card');
+            cards.forEach(function(card) {
+                card.classList.remove('active');
+            });
+            element.classList.add('active');
+        }
+
+        // لاگ آؤٹ پر کلک کرنے پر لوڈنگ چلا کر لاگ ان پیج پر جانا
+        function handleLogout(event) {
+            event.preventDefault();
+            var loader = document.getElementById('loadingSpinner');
+            loader.style.display = 'flex';
+
+            setTimeout(function() {
+                window.location.href = 'index.html';
+            }, 1500); // 1.5 سیکنڈ کی لوڈنگ
+        }
+    </script>
+
+    <!-- =============== PAGE LOADER SINGLE CODE =============== -->
+    <div id="page-loader" style="
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(255, 255, 255, 0.85);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 999999;
+      backdrop-filter: blur(2px);
+    ">
+      <div style="
+        width: 45px;
+        height: 45px;
+        border: 4px solid #e0e0e0;
+        border-top: 4px solid #007bff;
+        border-radius: 50%;
+        animation: loader-spin 0.8s linear infinite;
+      "></div>
+    </div>
+
+    <style>
+      @keyframes loader-spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    </style>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const pageLoader = document.getElementById('page-loader');
+        const allLinks = document.querySelectorAll('a');
+
+        allLinks.forEach(function(link) {
+          link.addEventListener('click', function(e) {
+            const href = this.getAttribute('href');
+
+            if (href && href !== '#' && !href.startsWith('javascript:') && !this.getAttribute('target')) {
+              e.preventDefault();
+
+              if (pageLoader) {
+                pageLoader.style.display = 'flex';
+              }
+
+              setTimeout(function() {
+                window.location.href = href;
+              }, 1000);
+            }
+          });
+        });
+      });
+    </script>
+    <!-- =============== END LOADER CODE =============== -->
+</body>
+</html>
+</body>
+</html>

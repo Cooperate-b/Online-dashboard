@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HSBC Bank - Statements</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; margin: 0; background-color: #f4f5f7; color: #333; font-size: 13px; }
+        
+        /* Top Navigation Bar */
+        .top-bar { background: #fff; height: 60px; padding: 0 25px; border-bottom: 1px solid #d9d9d9; display: flex; justify-content: space-between; align-items: center; }
+        .logo-container { display: flex; align-items: center; gap: 10px; }
+        .logo-img { height: 26px; width: auto; }
+        .brand-name { font-size: 18px; font-weight: 700; color: #db0011; letter-spacing: -0.3px; }
+        .top-nav-right { display: flex; align-items: center; gap: 25px; color: #4a4a4a; font-size: 12px; }
+        .nav-item { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+        .user-profile { display: flex; align-items: center; gap: 8px; }
+        .avatar { width: 28px; height: 28px; background: #db0011; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; }
+
+        /* Layout Container */
+        .main-layout { display: flex; min-height: calc(100vh - 60px); }
+
+        /* Left Sidebar */
+        .sidebar { width: 200px; background: #fff; border-right: 1px solid #e5e5e5; padding-top: 15px; flex-shrink: 0; }
+        .sidebar a { display: flex; align-items: center; gap: 12px; padding: 10px 20px; color: #4a4a4a; text-decoration: none; font-size: 13px; font-weight: 500; }
+        .sidebar a:hover { background-color: #f8f8f8; }
+        .sidebar a.active { background-color: #fcf2f2; color: #db0011; font-weight: 700; border-left: 4px solid #db0011; padding-left: 16px; }
+
+        /* Main Content */
+        .content { flex: 1; padding: 25px 35px; background: #fafafa; }
+        .page-title { font-size: 18px; font-weight: 700; color: #db0011; margin: 0 0 20px 0; display: flex; justify-content: space-between; align-items: center; }
+        .time-icon { color: #666; font-size: 14px; cursor: pointer; }
+
+        /* Account Header Box */
+        .account-card { background: #fff; border: 1px solid #e0e0e0; border-radius: 4px; padding: 20px 25px; margin-bottom: 25px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+        .account-main-info { display: flex; align-items: flex-start; gap: 18px; flex: 1.2; }
+        
+        .account-logo-img { width: 45px; height: auto; margin-top: 5px; flex-shrink: 0; }
+        .company-name { font-size: 15px; font-weight: 700; color: #111; margin-bottom: 4px; }
+        .sub-details { font-size: 12px; color: #555; line-height: 1.4; }
+        
+        .account-meta { flex: 1; border-left: 1px solid #eee; border-right: 1px solid #eee; padding: 0 25px; display: flex; flex-direction: column; gap: 8px; }
+        .meta-group label { display: block; font-size: 10px; color: #777; text-transform: uppercase; letter-spacing: 0.5px; }
+        .meta-group span { font-size: 12px; font-weight: 700; color: #222; }
+
+        .balance-section { flex: 1; padding-left: 25px; text-align: left; }
+        .balance-label { font-size: 11px; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+        .balance-amount { font-size: 22px; font-weight: 800; color: #111; }
+        .balance-words { font-size: 11px; color: #666; margin-top: 4px; }
+
+        /* Statements Section */
+        .transactions-card { background: #fff; border: 1px solid #e0e0e0; border-radius: 4px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+        .trans-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .trans-title { font-size: 14px; font-weight: 700; color: #db0011; margin: 0; }
+
+        /* Statements Table */
+        table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+        th { background: #db0011; color: white; text-align: left; padding: 10px 12px; font-size: 11px; font-weight: 700; border: 1px solid #db0011; }
+        td { padding: 12px; border: 1px solid #e8e8e8; font-size: 11px; color: #333; vertical-align: middle; }
+        tr:nth-child(even) td { background-color: #fafafa; }
+        
+        .btn-download { background: #db0011; color: #fff; border: none; padding: 6px 14px; font-size: 11px; font-weight: 700; border-radius: 3px; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; }
+        .btn-download:hover { background: #b8000e; }
+        
+        /* Progress Download Bar Overlay */
+        .download-box { display: none; margin-top: 15px; padding: 15px; background: #eef9f1; border: 1px solid #c3e6cb; border-radius: 4px; color: #155724; }
+        .progress-bar-bg { width: 100%; height: 8px; background: #ddd; border-radius: 4px; margin-top: 8px; overflow: hidden; }
+        .progress-bar-fill { height: 100%; width: 0%; background: #28a745; transition: width 0.1s linear; }
+
+        .disclaimer { font-size: 10px; color: #777; margin-top: 15px; }
+    </style>
+</head>
+<body>
+
+    <!-- Top Navigation Bar -->
+    <div class="top-bar">
+        <div class="logo-container">
+            <img src="logo.jpeg" alt="HSBC Logo" class="logo-img">
+            <span class="brand-name">HSBC Bank</span>
+        </div>
+        <div class="top-nav-right">
+            <div class="nav-item">✉ Messages</div>
+            <div class="nav-item">🔔 Notifications</div>
+            <div class="user-profile">
+                <div class="avatar">👤</div>
+                <div>
+                    <span style="font-size: 10px; color: #777; display: block;">Welcome,</span>
+                    <strong>Junaid Ikram</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Layout -->
+    <div class="main-layout">
+        
+        <!-- Left Sidebar Navigation -->
+        <div class="sidebar">
+            <a href="dashboard.html" onclick="navigateTo(event, 'dashboard.html')">田 Dashboard</a>
+            <a href="accounts.html" onclick="navigateTo(event, 'accounts.html')">📑 Accounts</a>
+            <a href="transfer.html" onclick="navigateTo(event, 'transfer.html')">⇄ Transfers</a>
+            <a href="payments.html" onclick="navigateTo(event, 'payments.html')">💳 Payments</a>
+            <a href="beneficiaries.html" onclick="navigateTo(event, 'beneficiaries.html')">👥 Beneficiaries</a>
+            <a href="#">📊 Trade Services</a>
+            <a href="#">📈 Reports</a>
+            <a href="statements.html" class="active" onclick="navigateTo(event, 'statements.html')">📄 Statements</a>
+            <a href="#">🔔 Alerts</a>
+            <a href="settings.html" onclick="navigateTo(event, 'settings.html')">⚙ Settings</a>
+            <a href="#">❓ Help & Support</a>
+            <a href="#" onclick="handleLogout(event)">↪ Logout</a>
+        </div>
+
+        <!-- Right Main Content Area -->
+        <div class="content">
+            <div class="page-title">
+                Account Statements
+                <span class="time-icon">🕒</span>
+            </div>
+
+            <!-- Account Summary Card -->
+            <div class="account-card">
+                <div class="account-main-info">
+                    <img src="logo.jpeg" alt="HSBC Logo" class="account-logo-img">
+                    <div>
+                        <div class="company-name">Junaid Ikram painting contracting L.L.C</div>
+                        <div class="sub-details">
+                            <strong>Business Account</strong><br>
+                            Dubai: BBMEAADXXX<br>
+                            <strong>Branch: HSBC Dubai Downtown</strong><br>
+                            HSBC Tower, Ground Floor, Emaar Square,<br>
+                            Downtown Dubai, United Arab Emirates.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="account-meta">
+                    <div class="meta-group">
+                        <label>Account Number</label>
+                        <span>AEBBME024202368001</span>
+                    </div>
+                    <div class="meta-group">
+                        <label>IBAN</label>
+                        <span>AE94020000024202368001</span>
+                    </div>
+                    <div class="meta-group">
+                        <label>Currency</label>
+                        <span>USD</span>
+                    </div>
+                </div>
+
+                <div class="balance-section">
+                    <div class="balance-label">AVAILABLE BALANCE</div>
+                    <div class="balance-amount">USD 1,240,000,000.00</div>
+                    <div class="balance-words">( One Billion Two Hundred Forty Million US Dollars Only )</div>
+                </div>
+            </div>
+
+            <!-- Download Statements Table Card -->
+            <div class="transactions-card">
+                <div class="trans-header">
+                    <h3 class="trans-title">Available E-Statements</h3>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Statement Period</th>
+                            <th>Document Type</th>
+                            <th>Statement Reference</th>
+                            <th>File Format</th>
+                            <th style="text-align: center;">Action</th>
+                        </tr>
+                    </thead>
+                   <tbody>
+    <tr>
+        <td>01/04/2026 - 20/05/2026</td>
+        <td>Official Account Statement</td>
+        <td>STMT-2026-05-8821</td>
+        <td>PDF Document (.pdf)</td>
+        <td style="text-align: center;">
+            <a href="#" onclick="startDownload(event, 'HSBC_Statement.pdf')" class="btn-action">📥 Download PDF</a>
+        </td>
+    </tr>
+    <tr>
+        <td>01/01/2026 - 31/03/2026</td>
+        <td>Quarterly Statement Q1</td>
+        <td>STMT-2026-03-4412</td>
+        <td>PDF Document (.pdf)</td>
+        <td style="text-align: center;">
+            <a href="#" onclick="startDownload(event, 'HSBC_Statement.pdf')" class="btn-action">📥 Download PDF</a>
+        </td>
+    </tr>
+    <tr>
+        <td>01/01/2026 - 30/06/2026</td>
+        <td>Annual Financial Statement</td>
+        <td>STMT-2025-12-0092</td>
+        <td>PDF Document (.pdf)</td>
+        <td style="text-align: center;">
+            <a href="#" onclick="startDownload(event, 'HSBC_Statement.pdf')" class="btn-action">📥 Download PDF</a>
+        </td>
+    </tr>
+</tbody>
+                </table>
+
+                <!-- Progress Bar & Download Status Alert Box -->
+                <div id="downloadBox" class="download-box">
+                    <div id="downloadText" style="font-weight: bold;">Downloading Statement... 0%</div>
+                    <div class="progress-bar-bg">
+                        <div id="progressFill" class="progress-bar-fill"></div>
+                    </div>
+                </div>
+
+                <div class="disclaimer">
+                    Note: E-Statements are official computer-generated documents and do not require physical signatures.
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Page Loader Overlay -->
+    <div class="loading-overlay" id="loadingSpinner" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(255, 255, 255, 0.75); justify-content: center; align-items: center; flex-direction: column; z-index: 2000;">
+        <div class="spinner" style="width: 45px; height: 45px; border: 4px solid #f3f3f3; border-top: 4px solid #db0011; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+        <p style="margin-top: 15px; font-weight: bold; color: #333; font-size: 13px;">Loading...</p>
+    </div>
+
+    <style>
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+
+    <!-- Navigation & Download Script -->
+    <script>
+        function navigateTo(event, pageUrl) {
+            event.preventDefault(); 
+            var loader = document.getElementById('loadingSpinner');
+            if(loader) {
+                loader.style.display = 'flex';
+            }
+            setTimeout(function() {
+                window.location.href = pageUrl;
+            }, 1200);
+        }
+
+        // Live Download Animation Script
+        function startDownload(fileName) {
+            var box = document.getElementById('downloadBox');
+            var text = document.getElementById('downloadText');
+            var fill = document.getElementById('progressFill');
+
+            box.style.display = 'block';
+            fill.style.width = '0%';
+            text.innerText = 'Downloading ' + fileName + '... 0%';
+
+            var progress = 0;
+            var interval = setInterval(function() {
+                progress += 10;
+                fill.style.width = progress + '%';
+                text.innerText = 'Downloading ' + fileName + '... ' + progress + '%';
+
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    text.innerText = '✅ Success! Statement downloaded successfully: ' + fileName;
+
+                    // Dummy File Download Execution
+                    var element = document.createElement('a');
+                    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent('HSBC Official Statement Document for Junaid Ikram painting contracting L.L.C'));
+                    element.setAttribute('download', fileName);
+                    element.style.display = 'none';
+                    document.body.appendChild(element);
+                    element.click();
+                    document.body.removeChild(element);
+                }
+            }, 150); // Speed of downloading animation
+        }
+    </script>
+<!-- =============== DOWNLOAD PROGRESS OVERLAY =============== -->
+<div id="downloadModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); justify-content: center; align-items: center; z-index: 99999;">
+    <div style="background: #fff; border-radius: 6px; padding: 25px 30px; width: 350px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.3); border-top: 4px solid #db0011;">
+        <div style="font-size: 14px; font-weight: bold; color: #111; margin-bottom: 8px;">Downloading Statement...</div>
+        <div style="font-size: 11px; color: #666; margin-bottom: 15px;">Please wait while your PDF statement is being generated.</div>
+        
+        <div style="width: 100%; background: #e0e0e0; height: 10px; border-radius: 5px; overflow: hidden; margin-bottom: 10px;">
+            <div id="downloadBar" style="width: 0%; height: 100%; background: #db0011; transition: width 0.1s ease;"></div>
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: bold; color: #333;">
+            <span>Status: Downloading</span>
+            <span id="downloadPercent">0%</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    function startDownload(event, fileName) {
+        if (event) event.preventDefault();
+        
+        var modal = document.getElementById('downloadModal');
+        var bar = document.getElementById('downloadBar');
+        var percentText = document.getElementById('downloadPercent');
+        
+        bar.style.width = '0%';
+        percentText.innerText = '0%';
+        modal.style.display = 'flex';
+        
+        var progress = 0;
+        
+        var interval = setInterval(function() {
+            progress += Math.floor(Math.random() * 8) + 5; 
+            
+            if (progress >= 100) {
+                progress = 100;
+                bar.style.width = '100%';
+                percentText.innerText = '100%';
+                clearInterval(interval);
+                
+                setTimeout(function() {
+                    modal.style.display = 'none';
+                    
+                    // Direct Download Trigger
+                    var element = document.createElement('a');
+                    element.setAttribute('href', fileName);
+                    element.setAttribute('download', fileName);
+                    element.style.display = 'none';
+                    document.body.appendChild(element);
+                    element.click();
+                    document.body.removeChild(element);
+                    
+                }, 500);
+            } else {
+                bar.style.width = progress + '%';
+                percentText.innerText = progress + '%';
+            }
+        }, 120);
+    }
+</script>
+<!-- =============== END DOWNLOAD PROGRESS CODE =============== -->
+</body>
+</html>

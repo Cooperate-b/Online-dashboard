@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HSBC Bank - Payments</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; margin: 0; background-color: #f4f5f7; color: #333; font-size: 13px; }
+        
+        /* Top Navigation Bar */
+        .top-bar { background: #fff; height: 60px; padding: 0 25px; border-bottom: 1px solid #d9d9d9; display: flex; justify-content: space-between; align-items: center; }
+        .logo-container { display: flex; align-items: center; gap: 10px; }
+        .logo-img { height: 26px; width: auto; }
+        .brand-name { font-size: 18px; font-weight: 700; color: #db0011; letter-spacing: -0.3px; }
+        .top-nav-right { display: flex; align-items: center; gap: 25px; color: #4a4a4a; font-size: 12px; }
+        .nav-item { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+        .user-profile { display: flex; align-items: center; gap: 8px; }
+        .avatar { width: 28px; height: 28px; background: #db0011; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; }
+
+        /* Layout Container */
+        .main-layout { display: flex; min-height: calc(100vh - 60px); }
+
+        /* Left Sidebar */
+        .sidebar { width: 200px; background: #fff; border-right: 1px solid #e5e5e5; padding-top: 15px; flex-shrink: 0; }
+        .sidebar a { display: flex; align-items: center; gap: 12px; padding: 10px 20px; color: #4a4a4a; text-decoration: none; font-size: 13px; font-weight: 500; }
+        .sidebar a:hover { background-color: #f8f8f8; }
+        .sidebar a.active { background-color: #fcf2f2; color: #db0011; font-weight: 700; border-left: 4px solid #db0011; padding-left: 16px; }
+
+        /* Main Content */
+        .content { flex: 1; padding: 25px 35px; background: #fafafa; }
+        .page-title { font-size: 18px; font-weight: 700; color: #db0011; margin: 0 0 20px 0; display: flex; justify-content: space-between; align-items: center; }
+        .time-icon { color: #666; font-size: 14px; cursor: pointer; }
+
+        /* Account Header Box */
+        .account-card { background: #fff; border: 1px solid #e0e0e0; border-radius: 4px; padding: 20px 25px; margin-bottom: 25px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+        .account-main-info { display: flex; align-items: flex-start; gap: 18px; flex: 1.2; }
+        
+        .account-logo-img { width: 45px; height: auto; margin-top: 5px; flex-shrink: 0; }
+        .company-name { font-size: 15px; font-weight: 700; color: #111; margin-bottom: 4px; }
+        .sub-details { font-size: 12px; color: #555; line-height: 1.4; }
+        
+        .account-meta { flex: 1; border-left: 1px solid #eee; border-right: 1px solid #eee; padding: 0 25px; display: flex; flex-direction: column; gap: 8px; }
+        .meta-group label { display: block; font-size: 10px; color: #777; text-transform: uppercase; letter-spacing: 0.5px; }
+        .meta-group span { font-size: 12px; font-weight: 700; color: #222; }
+
+        .balance-section { flex: 1; padding-left: 25px; text-align: left; }
+        .balance-label { font-size: 11px; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+        .balance-amount { font-size: 22px; font-weight: 800; color: #111; }
+        .balance-words { font-size: 11px; color: #666; margin-top: 4px; }
+
+        /* Actions Bar */
+        .payments-action-bar { display: flex; gap: 12px; margin-bottom: 20px; }
+        .btn-pay-primary { background: #db0011; color: #fff; border: none; padding: 9px 18px; font-size: 12px; font-weight: 700; border-radius: 3px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+        .btn-pay-secondary { background: #fff; color: #333; border: 1px solid #ccc; padding: 9px 18px; font-size: 12px; font-weight: 600; border-radius: 3px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+        .btn-pay-secondary:hover { background: #f8f8f8; }
+
+        /* Transactions Section */
+        .transactions-card { background: #fff; border: 1px solid #e0e0e0; border-radius: 4px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+        .trans-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .trans-title { font-size: 14px; font-weight: 700; color: #db0011; margin: 0; }
+        .trans-actions { display: flex; gap: 10px; }
+        .btn-filter, .btn-export { background: #fff; border: 1px solid #ccc; padding: 6px 12px; border-radius: 3px; font-size: 11px; color: #333; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+
+        /* Transaction Table */
+        table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+        th { background: #db0011; color: white; text-align: left; padding: 10px 12px; font-size: 11px; font-weight: 700; border: 1px solid #db0011; }
+        td { padding: 12px; border: 1px solid #e8e8e8; font-size: 11px; color: #333; vertical-align: top; }
+        tr:nth-child(even) td { background-color: #fafafa; }
+        .text-right { text-align: right; }
+        .total-row td { font-weight: 700; background-color: #f9f9f9; border-top: 2px solid #ccc; }
+        .disclaimer { font-size: 10px; color: #777; margin-top: 15px; }
+    </style>
+</head>
+<body>
+
+    <!-- Top Navigation Bar -->
+    <div class="top-bar">
+        <div class="logo-container">
+            <img src="logo.jpeg" alt="HSBC Logo" class="logo-img">
+            <span class="brand-name">HSBC Bank</span>
+        </div>
+        <div class="top-nav-right">
+            <div class="nav-item">✉ Messages</div>
+            <div class="nav-item">🔔 Notifications</div>
+            <div class="user-profile">
+                <div class="avatar">👤</div>
+                <div>
+                    <span style="font-size: 10px; color: #777; display: block;">Welcome,</span>
+                    <strong>Junaid Ikram</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Layout -->
+    <div class="main-layout">
+        
+        <!-- Left Sidebar Navigation -->
+        <div class="sidebar">
+            <a href="dashboard.html" onclick="navigateTo(event, 'dashboard.html')">田 Dashboard</a>
+            <a href="accounts.html" onclick="navigateTo(event, 'accounts.html')">📑 Accounts</a>
+            <a href="transfer.html" onclick="navigateTo(event, 'transfer.html')">⇄ Transfers</a>
+            <a href="payments.html" class="active" onclick="navigateTo(event, 'payments.html')">💳 Payments</a>
+            <a href="beneficiaries.html" onclick="navigateTo(event, 'beneficiaries.html')">👥 Beneficiaries</a>
+            <a href="#">📊 Trade Services</a>
+            <a href="#">📈 Reports</a>
+            <a href="statements.html" onclick="navigateTo(event, 'statements.html')">📄 Statements</a>
+            <a href="#">🔔 Alerts</a>
+            <a href="settings.html" onclick="navigateTo(event, 'settings.html')">⚙ Settings</a>
+            <a href="#">❓ Help & Support</a>
+            <a href="#" onclick="handleLogout(event)">↪ Logout</a>
+        </div>
+
+        <!-- Right Main Content Area -->
+        <div class="content">
+            <div class="page-title">
+                Payments
+                <span class="time-icon">🕒</span>
+            </div>
+
+            <!-- Account Summary Card -->
+            <div class="account-card">
+                <div class="account-main-info">
+                    <img src="logo.jpeg" alt="HSBC Logo" class="account-logo-img">
+                    <div>
+                        <div class="company-name">Junaid Ikram painting contracting L.L.C</div>
+                        <div class="sub-details">
+                            <strong>Business Account</strong><br>
+                            Dubai: BBMEAADXXX<br>
+                            <strong>Branch: HSBC Dubai Downtown</strong><br>
+                            HSBC Tower, Ground Floor, Emaar Square,<br>
+                            Downtown Dubai, United Arab Emirates.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="account-meta">
+                    <div class="meta-group">
+                        <label>Account Number</label>
+                        <span>AEBBME024202368001</span>
+                    </div>
+                    <div class="meta-group">
+                        <label>IBAN</label>
+                        <span>AE94020000024202368001</span>
+                    </div>
+                    <div class="meta-group">
+                        <label>Currency</label>
+                        <span>USD</span>
+                    </div>
+                </div>
+
+                <div class="balance-section">
+                    <div class="balance-label">AVAILABLE BALANCE</div>
+                    <div class="balance-amount">USD 1,240,000,000.00</div>
+                    <div class="balance-words">( One Billion Two Hundred Forty Million US Dollars Only )</div>
+                </div>
+            </div>
+
+            <!-- Transfer / Action Buttons -->
+            <div class="payments-action-bar">
+                <a href="transfer.html" class="btn-pay-primary" onclick="navigateTo(event, 'transfer.html')">+ Make a Payment</a>
+                <a href="transfer.html" class="btn-pay-secondary" onclick="navigateTo(event, 'transfer.html')">⇄ Transfer Between Accounts</a>
+                <a href="beneficiaries.html" class="btn-pay-secondary" onclick="navigateTo(event, 'beneficiaries.html')">👥 Manage Beneficiaries</a>
+            </div>
+
+            <!-- Received Payments History Table Card -->
+            <div class="transactions-card">
+                <div class="trans-header">
+                    <h3 class="trans-title">Received Payment History</h3>
+                    <div class="trans-actions">
+                        <button class="btn-filter">📅 01/04/2026 - 20/05/2026 ∨</button>
+                        <button class="btn-export">📥 Export</button>
+                    </div>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 90px;">Date</th>
+                            <th style="width: 90px;">Value Date</th>
+                            <th>Description</th>
+                            <th>Reference / Details</th>
+                            <th class="text-right" style="width: 120px;">Credits (USD)</th>
+                            <th class="text-right" style="width: 100px;">Debits (USD)</th>
+                            <th class="text-right" style="width: 130px;">Balance (USD)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>28/04/2026</td>
+                            <td>28/04/2026</td>
+                            <td>INWARD ONLINE TRANSFER<br>FROM: DBS BANK LTD - SINGAPORE<br>SINGAPORE</td>
+                            <td>REF: TRF28042026DBS0930M<br>ONLINE TRANSFER PAYMENT<br>FOR PROJECT ADVANCE</td>
+                            <td class="text-right">310,000,000.00</td>
+                            <td class="text-right">0.00</td>
+                            <td class="text-right">310,000,000.00</td>
+                        </tr>
+                        <tr>
+                            <td>15/05/2026</td>
+                            <td>15/05/2026</td>
+                            <td>INWARD ONLINE TRANSFER<br>FROM: ING. BANK LTD - SINGAPORE<br>SINGAPORE</td>
+                            <td>REF: TRF15052026DBS0930M<br>ONLINE TRANSFER CONTRACT<br>PAYMENT</td>
+                            <td class="text-right">930,000,000.00</td>
+                            <td class="text-right">0.00</td>
+                            <td class="text-right">1,240,000,000.00</td>
+                        </tr>
+                        <tr class="total-row">
+                            <td colspan="4" class="text-right">Total</td>
+                            <td class="text-right" style="color: #28a745;">1,240,000,000.00</td>
+                            <td class="text-right" style="color: #db0011;">0.00</td>
+                            <td class="text-right">1,240,000,000.00</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="disclaimer">
+                    Note: This is a computer generated statement and does not require any signature.
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingSpinner" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(255, 255, 255, 0.75); justify-content: center; align-items: center; flex-direction: column; z-index: 2000;">
+        <div class="spinner" style="width: 45px; height: 45px; border: 4px solid #f3f3f3; border-top: 4px solid #db0011; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+        <p style="margin-top: 15px; font-weight: bold; color: #333; font-size: 13px;">Loading...</p>
+    </div>
+
+    <style>
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+
+    <!-- Navigation Script -->
+    <script>
+        function navigateTo(event, pageUrl) {
+            event.preventDefault(); 
+            
+            var loader = document.getElementById('loadingSpinner');
+            if(loader) {
+                loader.style.display = 'flex';
+            }
+
+            setTimeout(function() {
+                window.location.href = pageUrl;
+            }, 1200);
+        }
+    </script>
+</body>
+</html>
